@@ -108,9 +108,9 @@ class SampleModal extends Modal {
 }
 
 class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
+	plugin: MovingCheckbox;
 
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, plugin: MovingCheckbox) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
