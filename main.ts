@@ -3,10 +3,6 @@ import { Notice, Plugin } from 'obsidian';
 export default class MovingCheckbox extends Plugin {
 
 	async onload() {
-		console.log('Loading plugin Moving checkbox');
-
-		new Notice("Hi, I'm the 'Moving Checkbox'plugin!")
-
 		this.addCommand({
 			id: "select_task",
 			name: "Select current task",
@@ -15,6 +11,13 @@ export default class MovingCheckbox extends Plugin {
 				const selection = editor.getLine(lineNr)
 				const checkboxRe = /[-*]\s\[ ] (?!~|\[\^\d+])/g
 				if (selection.match(checkboxRe)) {
+					// Find next day or create next day in daily calendar
+
+					// Copy task to next day
+
+					// Check settings what to do
+					// Change Task to moved [>]
+
 					new Notice(selection)
 				}
 			},
