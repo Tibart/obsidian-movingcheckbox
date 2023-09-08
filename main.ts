@@ -8,7 +8,7 @@ export default class MovingCheckbox extends Plugin {
 		this.addCommand({
 			id: "select_task",
 			name: "Select current task",
-			editorCallback(editor, ctx) {
+			async editorCallback(editor, ctx) {
 				const lineNr = editor.getCursor().line
 				const selection = editor.getLine(lineNr)
 				const checkboxRe = /[-*]\s\[ ] (?!~|\[\^\d+])/g
@@ -16,28 +16,26 @@ export default class MovingCheckbox extends Plugin {
 
 					// Find next day or create next day in daily calendar
 					const tomorrow = moment().add(1, "d")
-					const nextNote = getDailyNote(tomorrow, getAllDailyNotes())
+					let nextNote: TFile = getDailyNote(tomorrow, getAllDailyNotes())
 					if (!nextNote) {
-						createDailyNote(tomorrow)
-							.then(newNote =>  {
-								openNoteNewLeaf(ctx.app.workspace, newNote)
-							}); 
-					} else {
-						openNoteNewLeaf(ctx.app.workspace, nextNote)
-		
+						nextNote = await createDailyNote(tomorrow)
 					}	
-
+					
 					// Copy task to next day
-
+					
+					
 					// Check settings what to do
 					// Check settings skip weekend
 					// Change Task to moved [>]
+					
+					openNoteNewLeaf(ctx.app.workspace, nextNote)
 
 					//new Notice(note.name)
 				}
 			},
 		})
 
+		// TODO: move to seperate file
 		function openNoteNewLeaf(workspace: Workspace, note: TFile): void {
 			let exists = false;
 			workspace.iterateAllLeaves(l => { 
@@ -52,6 +50,11 @@ export default class MovingCheckbox extends Plugin {
 
 	onunload() {
 		//console.log('Unloading plugin Moving checkbox');
+		
+	}
+
+	async test(): Promise<void> {
+		console.log("Test");
 		
 	}
 }
