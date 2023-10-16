@@ -1,5 +1,5 @@
 import { Plugin, TFile, Workspace } from 'obsidian';
-import { getAllDailyNotes, getDailyNote, createDailyNote } from 'obsidian-daily-notes-interface';
+import { getAllDailyNotes, getDailyNote, createDailyNote, getDailyNoteSettings, getTemplateInfo } from 'obsidian-daily-notes-interface';
 import moment from 'moment';
 
 export default class MovingCheckbox extends Plugin {
@@ -9,8 +9,8 @@ export default class MovingCheckbox extends Plugin {
 			id: "select_task",
 			name: "Select current task",
 			async editorCallback(editor, ctx) {
-				const lineNr = editor.getCursor().line
-				const selection = editor.getLine(lineNr)
+				const cursor = editor.getCursor()
+				const selection = editor.getLine(cursor.line)
 				const checkboxRe = /[-*]\s\[ ] (?!~|\[\^\d+])/g
 				if (selection.match(checkboxRe)) {
 
@@ -22,15 +22,22 @@ export default class MovingCheckbox extends Plugin {
 					}	
 					
 					// Copy task to next day
+					let nextNoteContent = await ctx.app.vault.read(nextNote);
+					// TODO: insert checkbox at the right position
+					
+					nextNoteContent = nextNoteContent + selection + '\n'
+					ctx.app.vault.modify(nextNote, nextNoteContent)
+					
+					// Set existing task to completed
+					editor.setLine(cursor.line, selection.replace('[ ]', '[>]'))
+				
 					
 					
 					// Check settings what to do
 					// Check settings skip weekend
 					// Change Task to moved [>]
 					
-					openNoteNewLeaf(ctx.app.workspace, nextNote)
-
-					//new Notice(note.name)
+					//openNoteNewLeaf(ctx.app.workspace, nextNote)
 				}
 			},
 		})
