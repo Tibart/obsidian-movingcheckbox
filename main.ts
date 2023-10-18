@@ -1,10 +1,19 @@
-import { Plugin, TFile, Workspace } from 'obsidian';
+import { Plugin, TFile, Workspace } from 'obsidian'; 
 import { getAllDailyNotes, getDailyNote, createDailyNote, getDailyNoteSettings, getTemplateInfo } from 'obsidian-daily-notes-interface';
+import { MovingCheckboxSettingTab, MovingCheckboxSettings 	} from 'MovingCheckboxSettingTab';
 import moment from 'moment';
 
+const DEFAULT_SETTINGS: MovingCheckboxSettings = {
+	skipWeekend: true,
+}
+
 export default class MovingCheckbox extends Plugin {
+	settings: MovingCheckboxSettings
 
 	async onload() {
+		await this.loadSettings()
+		this.addSettingTab( new MovingCheckboxSettingTab(this.app, this)) 
+
 		this.addCommand({
 			id: "select_task",
 			name: "Select current task",
@@ -42,7 +51,7 @@ export default class MovingCheckbox extends Plugin {
 			},
 		})
 
-		// TODO: move to seperate file
+		// TODO: move to separate file
 		function openNoteNewLeaf(workspace: Workspace, note: TFile): void {
 			let exists = false;
 			workspace.iterateAllLeaves(l => { 
@@ -58,6 +67,14 @@ export default class MovingCheckbox extends Plugin {
 	onunload() {
 		//console.log('Unloading plugin Moving checkbox');
 		
+	}
+
+	async loadSettings() {
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+	}
+
+	async saveSettings() {
+		await this.saveData(this.settings);
 	}
 
 	async test(): Promise<void> {
