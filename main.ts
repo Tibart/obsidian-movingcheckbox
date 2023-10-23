@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Editor, Plugin, TFile, Workspace } from 'obsidian';
-import { getAllDailyNotes, getDailyNote, createDailyNote, getDailyNoteSettings, getTemplateInfo } from 'obsidian-daily-notes-interface';
+import { getAllDailyNotes, getDailyNote, createDailyNote } from 'obsidian-daily-notes-interface';
 import { MovingCheckboxSettingTab, MovingCheckboxSettings } from 'MovingCheckboxSettingTab';
 import moment from 'moment';
 import { Context } from 'vm';
@@ -12,7 +13,8 @@ export default class MovingCheckbox extends Plugin {
 	async loadSettings() {
 		const DEFAULT_SETTINGS: MovingCheckboxSettings = {
 			skipWeekend: true,
-			movedSign: '>'
+			movedSign: '>',
+			templateHeader: 'none',
 		}
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
 	}
@@ -39,9 +41,12 @@ export default class MovingCheckbox extends Plugin {
 			const selection = editor.getLine(cursor.line)
 			const checkboxRe = /[-*]\s\[ ] (?!~|\[\^\d+])/g
 
+			// TODO: Check if Daily notes plugin is enabled
+
 			if (selection.match(checkboxRe)) {
-				const nextDay = moment().add(skipDays(), "d")
+				const nextDay = moment().add(skipDays(), 'd')
 				let nextNote: TFile = getDailyNote(nextDay, getAllDailyNotes())
+				
 				if (!nextNote) {
 					nextNote = await createDailyNote(nextDay)
 				}
@@ -49,8 +54,9 @@ export default class MovingCheckbox extends Plugin {
 				// Copy task to next day
 				let nextNoteContent = await ctx.app.vault.read(nextNote);
 				
-				// TODO: insert checkbox at the right position
-				nextNoteContent = nextNoteContent + selection + '\n'
+				// TODO: make smarter! Check exists, add under existing bullets or above (setting)
+				const nextCheckbox = `${settings.templateHeader}\n${selection}`
+				nextNoteContent = nextNoteContent.replace(settings.templateHeader, nextCheckbox)
 				ctx.app.vault.modify(nextNote, nextNoteContent)
 				
 				// Set existing task to completed
