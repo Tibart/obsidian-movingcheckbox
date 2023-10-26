@@ -74,7 +74,6 @@ export class MovingCheckboxSettingTab extends PluginSettingTab {
         if (file === null) return {}
 
         const content = await this.app.vault.read(file)
-
         const headers: Record<string, string> = {}
         for (const header of Array.from(content.matchAll(/#{1,} .*/g)).map(h => h.toString())) {
             headers[header] = header
