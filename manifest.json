@@ -1,11 +1,11 @@
 {
-	"id": "obsidian-movingcheckbox",
+	"id": "movingcheckbox",
 	"name": "Moving checkbox",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"minAppVersion": "0.15.0",
 	"description": "This plugin wil help moving checkboxes that are part of the daily notes. This is useful when your using the daily notes as a bullet journal.",
 	"author": "Tibart J. Visser",
 	"authorUrl": "https://github.com/Tibart",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"fundingUrl": "",
 	"isDesktopOnly": false
 }
