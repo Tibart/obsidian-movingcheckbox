@@ -3,9 +3,9 @@
 	"name": "Moving checkbox",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "This plugin wil help moving checkboxes that are part of the daily notes that you like to move to the next day when not completed.",
+	"description": "This plugin wil help moving checkboxes that are part of the daily notes. This is useful when your using the daily notes as a bullet journal.",
 	"author": "Tibart J. Visser",
-	"authorUrl": "https://obsidian.md",
+	"authorUrl": "https://github.com/Tibart",
 	"fundingUrl": "https://obsidian.md/pricing",
 	"isDesktopOnly": false
 }
