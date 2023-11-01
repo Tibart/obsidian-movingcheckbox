@@ -22,25 +22,31 @@ export async function MoveCheckBox(plugin: MovingCheckbox, editor: Editor) {
         if (!nextNote) {
             nextNote = await createDailyNote(nextDay)
         }
-        
-        // TODO: when no header is selected put checkbox at the bottom or top, use setting!
-        // TODO: make smarter! Check exists. 
-        const nextCheckbox = `${plugin.settings.templateHeader}\n${selection}`
+  
         let nextNoteContent = await this.app.vault.read(nextNote);
-        let lines = nextNoteContent.split('\n')
-        let i = lines.indexOf(plugin.settings.templateHeader)
-        while (lines[i++].includes(checkbox)) {
-            
-        }
-        lines.splice(i, 0, selection)
-        nextNoteContent = nextNoteContent.replace(plugin.settings.templateHeader, nextCheckbox)
+        const nextNoteLines = nextNoteContent.split('\n')
+        let insertIdx = nextNoteLines.indexOf(plugin.settings.templateHeader) + 1
+
+        // TODO: Check if exists in checked state
+        const exists = nextNoteLines.indexOf(selection, insertIdx) >= 0
         
-        // Copy checkbox to next day and set existing checkbox to completed
-        this.app.vault.modify(nextNote, nextNoteContent)
+        if (!exists) {
+            if (!plugin.settings.addToTop) {
+                while (nextNoteLines[++insertIdx].match(checkboxRe)) { null }
+            }
+            nextNoteLines.splice(insertIdx, 0, selection)
+            nextNoteContent = nextNoteLines.join('\n')
+        
+            this.app.vault.modify(nextNote, nextNoteContent)
+        }
+        
         editor.setLine(cursor.line, selection.replace('[ ]', '[' + plugin.settings.movedSign + ']'))
         
-        // TODO: add settings option to be verbose, or not. 
-        new Notice('Moved checkbox: ' + selection.substring(checkbox.toString().length))
+        if (exists) {
+            new Notice('Checkbox already exists!')
+        } else {
+            new Notice('Moved checkbox: ' + selection.substring(checkbox.toString().length))
+        }
     }
 }
 

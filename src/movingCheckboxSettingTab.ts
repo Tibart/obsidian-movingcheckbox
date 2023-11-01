@@ -6,6 +6,7 @@ export interface MovingCheckboxSettings {
     skipWeekend: boolean,
     movedSign: string,
     templateHeader: string,
+    addToTop: boolean,
 }
 
 export class MovingCheckboxSettingTab extends PluginSettingTab {
@@ -24,6 +25,7 @@ export class MovingCheckboxSettingTab extends PluginSettingTab {
         this.addSkipWeekend()
         this.addMovedSign()
         this.addTemplateHeading()
+        this.addAddToTop()
     }
 
     addSkipWeekend(): void {
@@ -55,7 +57,7 @@ export class MovingCheckboxSettingTab extends PluginSettingTab {
         new Setting(this.containerEl)
             .setName('Template header')
             .setDesc('Under what template header should the checkbox be moved? You need to have the core plugin Daily notes enabled and selected a default template.')
-            .addDropdown(d =>  d
+            .addDropdown(d => d
                 .setDisabled(Object.keys(templateHeaders).length === 0 ? true : false)
                 .addOption('none', "No header")
                 .addOptions(templateHeaders)
@@ -65,7 +67,19 @@ export class MovingCheckboxSettingTab extends PluginSettingTab {
                     await this.plugin.saveSettings()
                 }))
     }
-
+    
+    addAddToTop() {
+        new Setting(this.containerEl)
+            .setName("Add to top of list")
+            .setDesc("Add the moved check box to the top or the bottom of the existing list?")
+            .addToggle(t => t
+                .setValue(this.plugin.settings.addToTop)
+                .onChange(async v => {
+                    this.plugin.settings.addToTop = v
+                    await this.plugin.saveSettings()
+                }))
+    }
+    
     async getTemplateHeaders(): Promise<Record<string, string>> {
         const path = getDailyNoteSettings().template
         if (!path) return {}

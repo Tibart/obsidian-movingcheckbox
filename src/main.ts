@@ -31,6 +31,7 @@ export default class MovingCheckbox extends Plugin {
 			skipWeekend: true,
 			movedSign: '>',
 			templateHeader: 'none',
+			addToTop: false,
 		}
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
 	}
