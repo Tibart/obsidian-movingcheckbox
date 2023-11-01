@@ -32,6 +32,7 @@ export default class MovingCheckbox extends Plugin {
 			movedSign: '>',
 			templateHeader: 'none',
 			addToTop: false,
+			onlyMoveUnchecked: false,
 		}
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
 	}

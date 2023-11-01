@@ -7,6 +7,7 @@ export interface MovingCheckboxSettings {
     movedSign: string,
     templateHeader: string,
     addToTop: boolean,
+    onlyMoveUnchecked: boolean,
 }
 
 export class MovingCheckboxSettingTab extends PluginSettingTab {
@@ -26,6 +27,7 @@ export class MovingCheckboxSettingTab extends PluginSettingTab {
         this.addMovedSign()
         this.addTemplateHeading()
         this.addAddToTop()
+        this.addOnlyMoveUnchecked();
     }
 
     addSkipWeekend(): void {
@@ -70,12 +72,23 @@ export class MovingCheckboxSettingTab extends PluginSettingTab {
     
     addAddToTop() {
         new Setting(this.containerEl)
-            .setName("Add to top of list")
+            .setName("Add to top of list?")
             .setDesc("Add the moved check box to the top or the bottom of the existing list?")
             .addToggle(t => t
                 .setValue(this.plugin.settings.addToTop)
                 .onChange(async v => {
                     this.plugin.settings.addToTop = v
+                    await this.plugin.saveSettings()
+                }))
+    }
+
+    addOnlyMoveUnchecked() {
+        new Setting(this.containerEl)
+            .setName("Only move unchecked?")
+            .addToggle(t => t
+                .setValue(this.plugin.settings.onlyMoveUnchecked)
+                .onChange(async v => {
+                    this.plugin.settings.onlyMoveUnchecked = v
                     await this.plugin.saveSettings()
                 }))
     }

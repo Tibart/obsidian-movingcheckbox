@@ -11,42 +11,45 @@ export async function MoveCheckBox(plugin: MovingCheckbox, editor: Editor) {
         return alert("You need the plugin 'Daily notes' enabled whe using this plugin!")
     }
 
+    // Get checkbox
     const cursor = editor.getCursor()
     const selection = editor.getLine(cursor.line)
-    const checkboxRe = /[-*]\s\[ ] (?!~|\[\^\d+])/g
+    const checkboxRe = plugin.settings.onlyMoveUnchecked
+        ? /[-*]\s\[ ] (?!~|\[\^\d+])/g
+        : /[-*]\s\[[xX*<>\-+#@=!?qQ ]] (?!~|\[\^\d+])/g 
     const checkbox = selection.match(checkboxRe)
     if (dailyNotesEnabled && checkbox) {
-
+        // Find or create target daily note
         const nextDay = moment().add(skipDays(plugin.settings.skipWeekend), 'd')
         let nextNote: TFile = getDailyNote(nextDay, getAllDailyNotes())
         if (!nextNote) {
             nextNote = await createDailyNote(nextDay)
         }
   
+        // Load next note and check if checkbox can be moved
         let nextNoteContent = await this.app.vault.read(nextNote);
         const nextNoteLines = nextNoteContent.split('\n')
-        let insertIdx = nextNoteLines.indexOf(plugin.settings.templateHeader) + 1
+        let insertIdx = nextNoteLines.indexOf(plugin.settings.templateHeader)
 
-        // TODO: Check if exists in checked state
-        const exists = nextNoteLines.indexOf(selection, insertIdx) >= 0
-        
-        if (!exists) {
-            if (!plugin.settings.addToTop) {
-                while (nextNoteLines[++insertIdx].match(checkboxRe)) { null }
-            }
-            nextNoteLines.splice(insertIdx, 0, selection)
-            nextNoteContent = nextNoteLines.join('\n')
-        
-            this.app.vault.modify(nextNote, nextNoteContent)
-        }
-        
-        editor.setLine(cursor.line, selection.replace('[ ]', '[' + plugin.settings.movedSign + ']'))
-        
+        // Check if already exists
+        const checkboxText = selection.substring(checkbox.toString().length)
+        const uncheckedSelection = '- [ ] ' + checkboxText
+        const exists = nextNoteLines.indexOf(uncheckedSelection, insertIdx + 1) >= 0
         if (exists) {
-            new Notice('Checkbox already exists!')
-        } else {
-            new Notice('Moved checkbox: ' + selection.substring(checkbox.toString().length))
+            return new Notice('Checkbox already exists!')
         }
+    
+        // Move checkbox
+        if (!plugin.settings.addToTop) {
+            while (nextNoteLines[insertIdx++].match(checkboxRe)) { null }
+        }
+        nextNoteLines.splice(insertIdx + 1, 0, uncheckedSelection)
+        nextNoteContent = nextNoteLines.join('\n')
+        this.app.vault.modify(nextNote, nextNoteContent)
+
+        // Check selected checkbox
+        editor.setLine(cursor.line, selection.replace('[ ]', '[' + plugin.settings.movedSign + ']'))
+        new Notice('Moved checkbox: ' + checkboxText)
     }
 }
 
