@@ -41,7 +41,7 @@ export async function MoveCheckBox(plugin: MovingCheckbox, editor: Editor) {
     
         // Move checkbox
         if (!plugin.settings.addToTop) {
-            while (nextNoteLines[insertIdx++].match(checkboxRe)) { null }
+            while (nextNoteLines[insertIdx].match(checkboxRe)) { insertIdx += 1 }
         }
         nextNoteLines.splice(insertIdx + 1, 0, uncheckedSelection)
         nextNoteContent = nextNoteLines.join('\n')
